@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>FRA Atlas - Local Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: hsla(10, 10, 10, 0.05);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .data-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .visitor-counter {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: black;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FRA Atlas Dashboard</h1>
+            <p>Forest Rights Act Implementation Data</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalStates">0</div>
+                <div>States Covered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalClaims">0</div>
+                <div>Total Claims (2018)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgGrowth">0%</div>
+                <div>Average Growth</div>
+            </div>
+        </div>
+
+        <table class="data-table" id="dataTable">
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>State</th>
+                    <th>2014</th>
+                    <th>2015</th>
+                    <th>2016</th>
+                    <th>2017</th>
+                    <th>2018</th>
+                    <th>Growth %</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="visitor-counter">
+        Visitor Count: <span id="visitorCount">0570770</span>
+    </div>
+
+    <script>
+        // Sample data from the CSV
+        const fraData = [
+            { sno: 1, state: "Andhra Pradesh", data: [165466, 165466, 62208, 73197, 74478] },
+            { sno: 2, state: "Assam", data: [37669, 37669, 0, 0, 0] },
+            { sno: 3, state: "Bihar", data: [1644, 4102, 4215, 4215, 4215] },
+            { sno: 4, state: "Chhattisgarh", data: [460023, 507907, 507907, 459576, 462403] },
+            { sno: 5, state: "Goa", data: [0, 0, 23, 311, 47] },
+            { sno: 6, state: "Gujarat", data: [3556, 3556, 0, 0, 64769] },
+            { sno: 7, state: "Himachal Pradesh", data: [2160, 2162, 0, 7, 0] },
+            { sno: 8, state: "Jharkhand", data: [16958, 25446, 25791, 27652, 29521] },
+            { sno: 9, state: "Karnataka", data: [173539, 188943, 171592, 171592, 180956] }
+        ];
+
+        function calculateGrowth(data) {
+            const start = data[0];
+            const end = data[data.length - 1];
+            if (start === 0) return end > 0 ? "∞" : "0";
+            return ((end - start) / start * 100).toFixed(1);
+        }
+
+        function loadData() {
+            const tableBody = document.getElementById('tableBody');
+            let totalClaims2018 = 0;
+            let totalGrowth = 0;
+            let validGrowthCount = 0;
+
+            fraData.forEach(row => {
+                const growth = calculateGrowth(row.data);
+                const growthNum = parseFloat(growth);
+
+                if (!isNaN(growthNum) && isFinite(growthNum)) {
+                    totalGrowth += growthNum;
+                    validGrowthCount++;
+                }
+
+                totalClaims2018 += row.data[4];
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.sno}</td>
+                    <td>${row.state}</td>
+                    <td>${row.data[0].toLocaleString()}</td>
+                    <td>${row.data[1].toLocaleString()}</td>
+                    <td>${row.data[2].toLocaleString()}</td>
+                    <td>${row.data[3].toLocaleString()}</td>
+                    <td>${row.data[4].toLocaleString()}</td>
+                    <td>${growth}%</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Update stats
+            document.getElementById('totalStates').textContent = fraData.length;
+            document.getElementById('totalClaims').textContent = totalClaims2018.toLocaleString();
+            document.getElementById('avgGrowth').textContent =
+                validGrowthCount > 0 ? (totalGrowth / validGrowthCount).toFixed(1) + '%' : '0%';
+        }
+
+        // Load data when page loads
+        window.onload = function () {
+            loadData();
+
+            // Disable back button (from original code)
+            window.history.forward();
+        };
+
+        // Prevent back button navigation
+        window.onpageshow = function (evt) {
+            if (evt.persisted) window.history.forward();
+        };
+        window.onunload = function () { void (0) };
+    </script>
+</body>
+
+</html>
