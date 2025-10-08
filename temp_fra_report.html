@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRA Claim Digitization Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .info-card {
+            background: #f8f9fa;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .info-card .label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .info-card .value {
+            font-size: 1.1em;
+            color: #333;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4444, #ffaa00, #44ff44);
+            transition: width 0.3s ease;
+        }
+        .raw-text {
+            background: #f1f3f4;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .timestamp {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ FRA Claim Report</h1>
+            <p>Forest Rights Act - Digital Claim Processing</p>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>📊 Processing Summary</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">Processing Status</div>
+                        <div class="value">
+                            <span class="status success">
+                                ✅ Success
+                            </span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Processing Time</div>
+                        <div class="value">0.03 seconds</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Confidence Score</div>
+                        <div class="value">
+                            0.85
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: 85.0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">Review Status</div>
+                        <div class="value">
+                            <span class="status success">
+                                ✅ Auto-Approved
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📋 Extracted Information</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="label">🆔 Claim ID</div>
+                        <div class="value">FRA/2023/MP/12345</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">👤 Claimant Name</div>
+                        <div class="value">Ramesh Kumar Gond</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">🏘️ Tribe/Community</div>
+                        <div class="value">Gond</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">🏡 Village</div>
+                        <div class="value">Khairwani</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">🏛️ District</div>
+                        <div class="value">Mandla</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">🗺️ State</div>
+                        <div class="value">Madhya Pradesh</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">📄 Claim Type</div>
+                        <div class="value">IFR</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">🌾 Land Area</div>
+                        <div class="value">2.5 hectares</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="label">📅 Application Date</div>
+                        <div class="value">15-07-2023</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📝 Raw Extracted Text</h2>
+                <div class="raw-text">
+            Forest Rights Act Claim Application
+            
+            Claim ID: FRA/2023/MP/12345
+            Applicant Name: Ramesh Kumar Gond
+            Tribe/Community: Gond
+            Village: Khairwani
+            District: Mandla
+            State: Madhya Pradesh
+            
+            Type of Claim: Individual Forest Rights (IFR)
+            Land Area Claimed: 2.5 hectares
+            Application Date: 15-07-2023
+            
+            Supporting Documents:
+            - Ration Card
+            - Voter ID
+            - Community Certificate
+            </div>
+            </div>
+            
+            <div class="timestamp">
+                Report generated on 2025-10-03 16:11:28
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+        

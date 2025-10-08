@@ -1,0 +1,115 @@
+PRD – OCR + NER Digitization Module (ADHIVAN)
+1. Objective
+To build a robust OCR + NER pipeline that digitizes scanned FRA (Forest Rights Act) claims into structured, validated, and geospatial-ready data for efficient processing and governance.
+
+2. Problem Statement
+Current FRA claims exist largely as scanned or handwritten documents, making them difficult to process, store, and validate at scale. Manual digitization is error-prone and resource-intensive. A scalable automation pipeline is needed to extract structured data with accuracy, multilingual support, and geospatial integration.
+
+3. Scope
+Inputs: Scanned PDFs/images (JPG/PNG) of FRA forms (printed + handwritten, single/multi-page).
+
+Outputs: Validated structured JSON objects stored in PostgreSQL + PostGIS.
+
+Supports multiple languages: Hindi, English, Odia, Telugu, Bengali, selected tribal dialects.
+
+Excludes: End-user mobile scanning app (planned future enhancement).
+
+4. Core Features
+4.1 Document Preprocessing
+Auto-enhancement: deskew, denoise, contrast/binarization.
+
+Page segmentation: detect headers/footers, stamps, handwritten notes.
+
+4.2 OCR Engine
+Ensemble OCR: Tesseract + PaddleOCR + FastVLM.
+
+Field-level confidence scoring (≥ 0.8 preferred threshold).
+
+Multi-lingual handling.
+
+4.3 NER (Named Entity Recognition)
+Model: HuggingFace Transformer (task-specific fine-tuning).
+
+Key entities extracted:
+
+Claimant Name
+
+Claim/Application ID
+
+Tribe/Community Name
+
+Village / District / State
+
+Claim Type (IFR / CR / CFR)
+
+Land Area (Ha)
+
+Supporting Documents Evidence Type
+
+Application Date
+
+4.4 Data Structuring & Validation
+JSON auto-generation:
+
+text
+{
+  "claim_id": "12345",
+  "claimant_name": "Ramesh Kumar",
+  "tribe": "Gond",
+  "village": "XYZ",
+  "district": "Mandla",
+  "state": "MP",
+  "claim_type": "IFR",
+  "land_area": "2.5",
+  "application_date": "12-07-2023",
+  "confidence_score": 0.92
+}
+Validation rules: Mandatory fields, correct date/number formats.
+
+Flag low-confidence entries for human review.
+
+4.5 Database & GIS Integration
+Data stored in PostgreSQL + PostGIS.
+
+Claims geotagged and linked with land parcel spatial layers.
+
+5. Users & Roles
+Public Users: Upload scanned FRA claim forms.
+
+Officials (Validators): Review flagged low-confidence claims.
+
+Admins: Manage OCR/NER models, add new datasets for fine-tuning.
+
+6. Success Metrics
+OCR Accuracy: ≥ 85% printed, ≥ 70% handwritten.
+
+NER Accuracy: ≥ 80% F1 score.
+
+Processing speed: ≤ 1 min/document.
+
+Automation success: ≥ 90% claims digitized without correction.
+
+7. Dependencies
+OCR: Tesseract, PaddleOCR, FastVLM.
+
+NER: HuggingFace Transformers (IndicBERT, BERT).
+
+Image Processing: OpenCV, PyMuPDF.
+
+Database: PostgreSQL + PostGIS.
+
+Backend: FastAPI/Flask microservice.
+
+8. Risks & Mitigation
+Low OCR accuracy for poor scans → Preprocessing, ensemble methods.
+
+Tribal dialect variations → Incremental training with user corrections.
+
+System overload → Batch uploads, cloud auto-scaling.
+
+9. Future Enhancements
+Offline OCR (mobile-first).
+
+Handwriting recognition tuned for tribal scripts.
+
+Blockchain-based notarization for tamper-proof pattas.
