@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRA Atlas - Government of India | Ministry of Tribal Affairs</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .gov-header {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 0.5rem 0;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .main-header {
+            background: white;
+            border-bottom: 3px solid #27ae60;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            gap: 2rem;
+        }
+
+        .gov-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .emblem {
+            width: 60px;
+            height: 60px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%23ff6b35"/><text x="50" y="55" text-anchor="middle" fill="white" font-size="20" font-weight="bold">भारत</text></svg>') center/contain no-repeat;
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        .header-text h1 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 0.2rem;
+            font-weight: bold;
+        }
+
+        .header-text .subtitle {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .navbar {
+            background: #2c3e50;
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+        }
+
+        .nav-menu li {
+            border-right: 1px solid #34495e;
+        }
+
+        .nav-menu li:last-child {
+            border-right: none;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #34495e;
+            border-bottom-color: #27ae60;
+        }
+
+        .main-content {
+            padding: 0;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page {
+            display: none;
+            padding: 2rem;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .map-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .map-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .control-group label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .control-group select {
+            padding: 0.25rem 0.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            min-width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .info-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #27ae60;
+            padding-bottom: 0.25rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .legend h4 {
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        .hero {
+            text-align: center;
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .stats-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: #27ae60;
+            color: white;
+            font-weight: bold;
+        }
+
+        .data-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .visitor-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #333;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .dashboard-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .feature-card button:hover {
+            background: #219a52 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Ensure canvas elements are visible */
+        canvas {
+            display: block !important;
+            border: 1px solid #ddd;
+            background: white;
+            max-width: 100%;
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hamburger {
+                display: flex;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .dashboard-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gov-header">
+        भारत सरकार | Government of India | Ministry of Tribal Affairs
+    </div>
+    
+    <header class="main-header">
+        <div class="header-container">
+            <div class="gov-logo">
+                <div class="emblem"></div>
+                <div class="header-text">
+                    <h1>Forest Rights Act Atlas</h1>
+                    <div class="subtitle">Comprehensive FRA Implementation Monitoring System</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active" onclick="showPage('atlas')"><i class="fas fa-map"></i> FRA Atlas</a></li>
+                <li><a href="#" class="nav-link" onclick="showPage('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="#" class="nav-link" onclick="showPage('claims')"><i class="fas fa-file-alt"></i> Claims Analysis</a></li>
+                <li><a href="#" class="nav-link" onclick="showPage('titles')"><i class="fas fa-certificate"></i> Title Distribution</a></li>
+                <li><a href="#" class="nav-link" onclick="showPage('claimants')"><i class="fas fa-users"></i> Claimants</a></li>
+                <li><a href="#" class="nav-link" onclick="showPage('reports')"><i class="fas fa-download"></i> Reports</a></li>
+                <li><a href="#" class="nav-link" onclick="showPage('about')"><i class="fas fa-info-circle"></i> About FRA</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- FRA Atlas Map Page -->
+        <div id="atlas" class="page active">
+            <div class="map-container">
+                <div class="map-header">
+                    <h2><i class="fas fa-map-marked-alt"></i> Interactive FRA Atlas - India</h2>
+                    <div class="map-controls">
+                        <div class="control-group">
+                            <label>View Type:</label>
+                            <select id="viewType" onchange="updateMapView()">
+                                <option value="claims">Claims Distribution</option>
+                                <option value="titles">Title Distribution</option>
+                                <option value="success">Success Rate</option>
+                                <option value="land">Land Area</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Filter by Status:</label>
+                            <select id="statusFilter" onchange="filterMapMarkers()">
+                                <option value="">All Status</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Under Review">Under Review</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Rejected">Rejected</option>
+                                <option value="Documentation Required">Documentation Required</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label>Filter by State:</label>
+                            <select id="mapStateFilter" onchange="filterMapMarkers()">
+                                <option value="">All States</option>
+                                <option value="Odisha">Odisha</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Telangana">Telangana</option>
+                                <option value="Tripura">Tripura</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="position: relative;">
+                    <div id="map"></div>
+                    
+                    <div id="infoPanel" class="info-panel">
+                        <h3 id="stateName">Select a State</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Total Claims</span>
+                                <span class="info-value" id="totalClaims">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Individual Claims</span>
+                                <span class="info-value" id="individualClaims">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Community Claims</span>
+                                <span class="info-value" id="communityClaims">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Titles Distributed</span>
+                                <span class="info-value" id="titlesDistributed">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Success Rate</span>
+                                <span class="info-value" id="successRate">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Land Area (Acres)</span>
+                                <span class="info-value" id="landArea">-</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Recent Claimants</h4>
+                            <div id="recentClaimants" style="font-size: 0.9rem; color: #555;">
+                                <!-- Sample claimant data will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="legend">
+                        <h4>Claim Status Legend</h4>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #27ae60;"></div>
+                            <span>Approved Claims</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #f39c12;"></div>
+                            <span>Under Review</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #3498db;"></div>
+                            <span>Pending Claims</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #e74c3c;"></div>
+                            <span>Rejected Claims</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #9b59b6;"></div>
+                            <span>Documentation Required</span>
+                        </div>
+                        <div style="margin-top: 0.5rem; font-size: 0.8rem; color: #666;">
+                            <i class="fas fa-info-circle"></i> Marker size indicates land area
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <h3 style="text-align: center; margin-bottom: 1rem; color: #2c3e50;">National FRA Implementation Summary</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="nationalTotalStates">29</div>
+                        <div>States/UTs Covered</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="nationalTotalClaims">2.8M</div>
+                        <div>Total Claims Received</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="nationalTotalTitles">1.9M</div>
+                        <div>Titles Distributed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="nationalTotalLand">60M</div>
+                        <div>Acres Allocated</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page">
+            <div class="stats-container">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">
+                    <i class="fas fa-chart-line"></i> FRA Performance Dashboard
+                </h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="dashTotalStates">29</div>
+                        <div>States/UTs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="dashTotalClaims">2.8M</div>
+                        <div>Total Claims</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="dashTotalTitles">1.9M</div>
+                        <div>Titles Distributed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="dashTotalLand">60M</div>
+                        <div>Acres Allocated</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Embedded Dashboard Container -->
+            <div class="dashboard-container" style="background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 2rem;">
+                <div class="dashboard-header" style="background: #2c3e50; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+                    <h3><i class="fas fa-tachometer-alt"></i> Tribal Analytics Dashboard</h3>
+                    <div class="dashboard-controls" style="display: flex; gap: 1rem; align-items: center;">
+                        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <label style="font-size: 0.8rem; opacity: 0.9;">Dashboard Type:</label>
+                            <select id="dashboardType" onchange="updateDashboard()" style="padding: 0.25rem 0.5rem; border: none; border-radius: 4px; font-size: 0.9rem;">
+                                <option value="performance">Performance Dashboard</option>
+                                <option value="analytics">Analytics Dashboard</option>
+                                <option value="reports">Reports Dashboard</option>
+                            </select>
+                        </div>
+                        <button onclick="refreshDashboard()" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button onclick="testCharts()" style="padding: 0.5rem 1rem; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-bug"></i> Test Charts
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="position: relative; height: 600px;">
+                    <!-- Fallback Dashboard Content -->
+                    <div id="fallbackDashboard" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column;">
+                        <!-- Dashboard Header Stats -->
+                        <div style="padding: 2rem; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold;" id="dashboardClaims">2,847,592</div>
+                                    <div>Total Claims Processed</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold;" id="dashboardTitles">1,923,456</div>
+                                    <div>Titles Distributed</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold;" id="dashboardSuccess">67.5%</div>
+                                    <div>Success Rate</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 2rem; font-weight: bold;" id="dashboardLand">58.2M</div>
+                                    <div>Acres Allocated</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dashboard Charts Area -->
+                        <div style="flex: 1; padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <!-- Individual Forest Rights Status -->
+                            <div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <h4 style="margin-bottom: 1rem; color: #2c3e50;">Status of Individual Forest Rights</h4>
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.8rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <div style="width: 12px; height: 12px; background: #f39c12; border-radius: 2px;"></div>
+                                        <span>IFR Claims Received</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <div style="width: 12px; height: 12px; background: #e74c3c; border-radius: 2px;"></div>
+                                        <span>IFR Titles Distributed</span>
+                                    </div>
+                                </div>
+                                <canvas id="individualRightsChart" width="400" height="250"></canvas>
+                            </div>
+                            
+                            <!-- Community Forest Rights Status -->
+                            <div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <h4 style="margin-bottom: 1rem; color: #2c3e50;">Status of Community Forest Rights</h4>
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.8rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <div style="width: 12px; height: 12px; background: #3498db; border-radius: 2px;"></div>
+                                        <span>CFR Claim Received</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <div style="width: 12px; height: 12px; background: #9b59b6; border-radius: 2px;"></div>
+                                        <span>CFR Titles Distributed</span>
+                                    </div>
+                                </div>
+                                <canvas id="communityRightsChart" width="400" height="250"></canvas>
+                            </div>
+                            
+                            <!-- State-wise Forest Land Recognised -->
+                            <div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <h4 style="margin-bottom: 1rem; color: #2c3e50;">State-Wise Forest Land Recognised (in Lakh Acres)</h4>
+                                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.8rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <div style="width: 12px; height: 12px; background: #27ae60; border-radius: 2px;"></div>
+                                        <span>IFR Forest Land</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                        <div style="width: 12px; height: 12px; background: #2980b9; border-radius: 2px;"></div>
+                                        <span>CFR Forest Land</span>
+                                    </div>
+                                </div>
+                                <canvas id="forestLandChart" width="400" height="250"></canvas>
+                            </div>
+                            
+                            <!-- Claims Status Pie Chart -->
+                            <div style="background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                <h4 style="margin-bottom: 1rem; color: #2c3e50;">Claims Status</h4>
+                                <div style="position: relative;">
+                                    <canvas id="claimsStatusChart" width="400" height="250"></canvas>
+                                    <div style="position: absolute; top: 10px; right: 10px; font-size: 0.8rem;">
+                                        <div style="margin-bottom: 0.5rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                                <div style="width: 12px; height: 12px; background: #e74c3c; border-radius: 2px;"></div>
+                                                <span>Rejected Claims</span>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom: 0.5rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                                <div style="width: 12px; height: 12px; background: #95a5a6; border-radius: 2px;"></div>
+                                                <span>Total Titles Distributed</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                                <div style="width: 12px; height: 12px; background: #9b59b6; border-radius: 2px;"></div>
+                                                <span>Pending Claims</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- External Dashboard Iframe (Hidden by default due to access issues) -->
+                    <iframe id="tribalDashboard" 
+                            src="about:blank" 
+                            width="100%" 
+                            height="100%" 
+                            frameborder="0" 
+                            allowfullscreen="" 
+                            style="position: absolute; top: 0; left: 0; display: none;">
+                    </iframe>
+                    
+                    <!-- Loading Overlay -->
+                    <div id="dashboardLoading" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; flex-direction: column;">
+                        <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #27ae60; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 1rem; color: #666;">Loading Dashboard...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Analytics Summary -->
+            <div class="chart-container">
+                <h3><i class="fas fa-chart-bar"></i> Implementation Analytics Summary</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 1rem;">
+                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <h4 style="color: #27ae60;">Top Performing State</h4>
+                        <p style="font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">Chhattisgarh</p>
+                        <small>524,341 titles distributed</small>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <h4 style="color: #27ae60;">Highest Success Rate</h4>
+                        <p style="font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">Gujarat</p>
+                        <small>53.3% success rate</small>
+                    </div>
+                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                        <h4 style="color: #27ae60;">Most Land Allocated</h4>
+                        <p style="font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">Chhattisgarh</p>
+                        <small>6.09M acres allocated</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claims Analysis Page -->
+        <div id="claims" class="page">
+            <div class="stats-container">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Claims Analysis</h2>
+                <input type="text" class="search-box" placeholder="Search by state name..." id="claimsSearch">
+                <table class="data-table" id="claimsTable">
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Individual Claims</th>
+                            <th>Community Claims</th>
+                            <th>Total Claims</th>
+                            <th>Success Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="claimsTableBody">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Title Distribution Page -->
+        <div id="titles" class="page">
+            <div class="stats-container">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">Title Distribution</h2>
+                <input type="text" class="search-box" placeholder="Search by state name..." id="titlesSearch">
+                <table class="data-table" id="titlesTable">
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Individual Titles</th>
+                            <th>Community Titles</th>
+                            <th>Total Titles</th>
+                            <th>Land Area (Acres)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="titlesTableBody">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Claimants Page -->
+        <div id="claimants" class="page">
+            <div class="stats-container">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">
+                    <i class="fas fa-users"></i> FRA Claimants Database
+                </h2>
+                
+                <!-- Summary Statistics -->
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalClaimants">600</div>
+                        <div>Total Claimants</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="approvedClaimants">0</div>
+                        <div>Approved Claims</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="pendingClaimants">0</div>
+                        <div>Pending Claims</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalLandClaimed">0</div>
+                        <div>Total Land (Ha)</div>
+                    </div>
+                </div>
+
+                <!-- Search and Filter Controls -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <input type="text" id="claimantSearch" placeholder="Search by name, village, or tribe..." 
+                           style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                    <select id="stateFilter" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">All States</option>
+                        <option value="Odisha">Odisha</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="Tripura">Tripura</option>
+                    </select>
+                    <select id="statusFilter" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">All Status</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                    <select id="claimTypeFilter" style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px;">
+                        <option value="">All Claim Types</option>
+                        <option value="Individual">Individual Rights</option>
+                        <option value="Community">Community Rights</option>
+                        <option value="Traditional">Traditional Rights</option>
+                    </select>
+                </div>
+
+                <!-- Claimants Table -->
+                <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <table class="data-table" id="claimantsTable">
+                        <thead>
+                            <tr>
+                                <th>Claim ID</th>
+                                <th>Name</th>
+                                <th>Tribe</th>
+                                <th>Village</th>
+                                <th>District</th>
+                                <th>State</th>
+                                <th>Land Area (Ha)</th>
+                                <th>Claim Type</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="claimantsTableBody">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem;">
+                    <button id="prevPage" onclick="changePage(-1)" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <span id="pageInfo" style="font-weight: bold;">Page 1 of 1</span>
+                    <button id="nextPage" onclick="changePage(1)" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claimant Detail Modal -->
+        <div id="claimantModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+            <div style="background: white; border-radius: 10px; padding: 2rem; max-width: 600px; width: 90%; max-height: 80%; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3 id="modalTitle" style="color: #2c3e50;">Claimant Details</h3>
+                    <button onclick="closeClaimantModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666;">×</button>
+                </div>
+                <div id="modalContent">
+                    <!-- Claimant details will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reports" class="page">
+            <div class="stats-container">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">
+                    <i class="fas fa-download"></i> Reports & Downloads
+                </h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h3>Annual Report 2023</h3>
+                        <p>Comprehensive annual FRA implementation report with state-wise analysis and performance metrics</p>
+                        <div style="margin-top: 1rem;">
+                            <small style="color: #666; display: block; margin-bottom: 0.5rem;">File Size: 2.4 MB | Last Updated: Dec 2023</small>
+                            <button onclick="downloadAnnualReport()" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s;">
+                                <i class="fas fa-download"></i> Download PDF
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <h3>State-wise Data Export</h3>
+                        <p>Detailed state-wise implementation data in Excel format with claims, titles, and land area information</p>
+                        <div style="margin-top: 1rem;">
+                            <small style="color: #666; display: block; margin-bottom: 0.5rem;">File Size: 1.8 MB | Format: XLSX</small>
+                            <button onclick="downloadStateData()" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s;">
+                                <i class="fas fa-download"></i> Download Excel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>Analytics Dashboard Export</h3>
+                        <p>Interactive analytics and visualizations exported as PDF with charts and graphs</p>
+                        <div style="margin-top: 1rem;">
+                            <small style="color: #666; display: block; margin-bottom: 0.5rem;">File Size: 3.2 MB | Format: PDF</small>
+                            <button onclick="downloadAnalytics()" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s;">
+                                <i class="fas fa-download"></i> Download Analytics
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <h3>GIS Data Package</h3>
+                        <p>Geographical data files including shapefiles and KML for GIS applications</p>
+                        <div style="margin-top: 1rem;">
+                            <small style="color: #666; display: block; margin-bottom: 0.5rem;">File Size: 15.6 MB | Format: ZIP</small>
+                            <button onclick="downloadGISData()" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s;">
+                                <i class="fas fa-download"></i> Download GIS Data
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3>Raw Data CSV</h3>
+                        <p>Complete raw dataset in CSV format for custom analysis and research purposes</p>
+                        <div style="margin-top: 1rem;">
+                            <small style="color: #666; display: block; margin-bottom: 0.5rem;">File Size: 890 KB | Format: CSV</small>
+                            <button onclick="downloadRawData()" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s;">
+                                <i class="fas fa-download"></i> Download CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-powerpoint"></i>
+                        </div>
+                        <h3>Presentation Template</h3>
+                        <p>PowerPoint presentation template with FRA statistics and charts for official presentations</p>
+                        <div style="margin-top: 1rem;">
+                            <small style="color: #666; display: block; margin-bottom: 0.5rem;">File Size: 4.1 MB | Format: PPTX</small>
+                            <button onclick="downloadPresentation()" style="padding: 0.5rem 1rem; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s;">
+                                <i class="fas fa-download"></i> Download PPTX
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Download History Section -->
+                <div style="margin-top: 3rem; background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+                        <i class="fas fa-history"></i> Recent Downloads
+                    </h3>
+                    <div id="downloadHistory" style="max-height: 200px; overflow-y: auto;">
+                        <div style="padding: 0.5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                            <span>No downloads yet</span>
+                            <small style="color: #666;">-</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="about" class="page">
+            <div class="stats-container">
+                <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">About Forest Rights Act</h2>
+                <div style="line-height: 1.6; color: #555;">
+                    <h3>The Scheduled Tribes and Other Traditional Forest Dwellers (Recognition of Forest Rights) Act, 2006</h3>
+                    <p style="margin: 1rem 0;">The Forest Rights Act (FRA) is a landmark legislation that recognizes the rights of forest-dwelling tribal communities and other traditional forest dwellers to forest resources, on which these communities were dependent for a variety of needs, including livelihood, habitation and other socio-cultural needs.</p>
+                    
+                    <h4 style="margin-top: 2rem;">Key Objectives:</h4>
+                    <ul style="margin: 1rem 0; padding-left: 2rem;">
+                        <li>Recognition of forest rights of forest dwelling Scheduled Tribes and other traditional forest dwellers</li>
+                        <li>Strengthening the conservation regime of the forests while ensuring livelihood and food security</li>
+                        <li>Ensuring the forest dwelling Scheduled Tribes and other traditional forest dwellers are integral to the sustainable use, conservation and management of forests</li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 2rem;">Types of Rights Recognized:</h4>
+                    <ul style="margin: 1rem 0; padding-left: 2rem;">
+                        <li><strong>Individual Forest Rights:</strong> Rights to land occupied for habitation and cultivation</li>
+                        <li><strong>Community Forest Rights:</strong> Rights over common property resources</li>
+                        <li><strong>Community Forest Resource Rights:</strong> Rights to protect, regenerate, conserve and manage community forest resources</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="visitor-counter">
+        <i class="fas fa-users"></i> Visitors: <span id="visitorCount">570,770</span>
+    </div>
+
+    <script src="claimant-data-parser.js"></script>
+    <script src="app.js"></script>
+    <script src="charts.js"></script>
+</body>
+</html>

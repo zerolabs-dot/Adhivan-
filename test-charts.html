@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart Test</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin: 10px;
+        }
+        .chart-container {
+            display: inline-block;
+            margin: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chart Test Page</h1>
+    
+    <div class="chart-container">
+        <h3>Forest Land Chart</h3>
+        <canvas id="forestLandChart" width="400" height="250"></canvas>
+    </div>
+    
+    <div class="chart-container">
+        <h3>Claims Status Chart</h3>
+        <canvas id="claimsStatusChart" width="400" height="250"></canvas>
+    </div>
+    
+    <button onclick="testCharts()">Test Charts</button>
+    
+    <script>
+        // Sample data
+        const fraData2023 = [
+            {state: "Chhattisgarh", landArea: 6090348.55},
+            {state: "Madhya Pradesh", landArea: 2500000},
+            {state: "Odisha", landArea: 1800000},
+            {state: "Gujarat", landArea: 1404189.01},
+            {state: "Maharashtra", landArea: 890000}
+        ];
+        
+        function testCharts() {
+            console.log('Testing charts...');
+            createForestLandChart();
+            createClaimsStatusChart();
+        }
+        
+        function createForestLandChart() {
+            const canvas = document.getElementById('forestLandChart');
+            if (!canvas) {
+                console.log('forestLandChart canvas not found');
+                return;
+            }
+            
+            console.log('Creating forest land chart...');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw background
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Get top 5 states by land area
+            const topStates = fraData2023
+                .map(state => ({
+                    name: state.state.length > 8 ? state.state.substring(0, 8) + '...' : state.state,
+                    landArea: state.landArea / 100000 // Convert to lakh acres
+                }))
+                .sort((a, b) => b.landArea - a.landArea)
+                .slice(0, 5);
+            
+            const barWidth = (width - 80) / topStates.length - 10;
+            const maxValue = Math.max(...topStates.map(s => s.landArea));
+            
+            topStates.forEach((state, index) => {
+                const x = 40 + index * (barWidth + 10);
+                
+                // IFR bar (70%)
+                const ifrLand = state.landArea * 0.7;
+                const ifrHeight = (ifrLand / maxValue) * (height - 100);
+                const ifrY = height - ifrHeight - 50;
+                ctx.fillStyle = '#27ae60';
+                ctx.fillRect(x, ifrY, barWidth/2 - 2, ifrHeight);
+                
+                // CFR bar (30%)
+                const cfrLand = state.landArea * 0.3;
+                const cfrHeight = (cfrLand / maxValue) * (height - 100);
+                const cfrY = height - cfrHeight - 50;
+                ctx.fillStyle = '#2980b9';
+                ctx.fillRect(x + barWidth/2 + 2, cfrY, barWidth/2 - 2, cfrHeight);
+                
+                // State name
+                ctx.fillStyle = '#2c3e50';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(state.name, x + barWidth/2, height - 25);
+                
+                // Value
+                ctx.font = '10px Arial';
+                ctx.fillText(state.landArea.toFixed(1) + 'L', x + barWidth/2, ifrY - 8);
+            });
+            
+            // Title
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('Forest Land (Lakh Acres)', 10, 25);
+            
+            console.log('Forest land chart created');
+        }
+        
+        function createClaimsStatusChart() {
+            const canvas = document.getElementById('claimsStatusChart');
+            if (!canvas) {
+                console.log('claimsStatusChart canvas not found');
+                return;
+            }
+            
+            console.log('Creating claims status chart...');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw background
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Sample data
+            const approved = 1923456;
+            const pending = 624136;
+            const rejected = 300000;
+            const total = approved + pending + rejected;
+            
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = 80;
+            
+            let currentAngle = -Math.PI / 2;
+            
+            // Approved slice
+            const approvedAngle = (approved / total) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + approvedAngle);
+            ctx.closePath();
+            ctx.fillStyle = '#27ae60';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            currentAngle += approvedAngle;
+            
+            // Pending slice
+            const pendingAngle = (pending / total) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + pendingAngle);
+            ctx.closePath();
+            ctx.fillStyle = '#f39c12';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            currentAngle += pendingAngle;
+            
+            // Rejected slice
+            const rejectedAngle = (rejected / total) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + rejectedAngle);
+            ctx.closePath();
+            ctx.fillStyle = '#e74c3c';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Center text
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Claims Status', centerX, centerY - 5);
+            ctx.font = '10px Arial';
+            ctx.fillText('2.8M Total', centerX, centerY + 10);
+            
+            // Legend
+            ctx.font = '10px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#27ae60';
+            ctx.fillRect(20, height - 60, 12, 12);
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillText('Approved (67.5%)', 35, height - 50);
+            
+            ctx.fillStyle = '#f39c12';
+            ctx.fillRect(20, height - 40, 12, 12);
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillText('Pending (21.9%)', 35, height - 30);
+            
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(20, height - 20, 12, 12);
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillText('Rejected (10.6%)', 35, height - 10);
+            
+            console.log('Claims status chart created');
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            setTimeout(testCharts, 500);
+        };
+    </script>
+</body>
+</html>
