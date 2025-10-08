@@ -1,0 +1,93 @@
+PRD – Decision Support System (DSS) Module (ADHIVAN)
+1. Objective
+Enable government and NGO officials to make timely, data-driven land rights decisions by providing real-time actionable insights from digitized FRA claims combined with spatial, temporal, and socio-economic analytics.
+
+2. Problem Statement
+Manual analysis of FRA claims and geospatial data is inefficient and error-prone. Officials lack integrated tools to visualize claim distribution, detect conflicts, and monitor land use trends, impeding effective policy-making and resource allocation.
+
+3. Scope
+Process and analyze digitized FRA claim data linked with geospatial PostGIS layers and historical datasets.
+
+Provide interactive dashboards and customizable reports with spatial, temporal, and predictive analytics.
+
+Support alerting for data anomalies and operational exceptions.
+
+Facilitate user roles with appropriate data access and verification workflows.
+
+4. Core Features
+4.1 Dashboard & Visualization
+Interactive geospatial maps:
+
+Claimed land types (IFR/CR/CFR)
+
+Tribal distribution overlays
+
+Land-use classifications (forest, agriculture, wasteland)
+
+Key performance charts:
+
+Claims by district/state
+
+Pending vs. approved claims
+
+Land area granted vs. disputed
+
+4.2 Analytics & Reporting
+Spatial Analysis: Overlap detection and land-use changes via satellite data integration.
+
+Temporal Analysis: Trends in claim submissions and approval times.
+
+Predictive Analytics: Forecast conflict zones and areas needing government action.
+
+4.3 Alerts & Notifications
+Automated alerts for claims needing verification or flagged anomalies.
+
+Notification of expired or incomplete claims for timely intervention.
+
+4.4 Data Integration & Querying
+Seamless ingestion from OCR+NER FRA database, PostGIS geospatial layers, and FRA archives.
+
+Advanced search filters by geography, tribe, claim type, and date ranges.
+
+4.5 User Roles & Access
+Officials/Planners: Full dashboard access, analytics, report export.
+
+Field Officers: Restricted claim update and verification permissions.
+
+Administrators: Configure system rules, manage users, update datasets.
+
+5. Success Metrics
+≥ 95% of digitized claims accurately represented in dashboards.
+
+Standard report generation time ≤ 30 seconds.
+
+User satisfaction ≥ 85% on usability and accuracy surveys.
+
+Predictive alert accuracy ≥ 80% for flagged conflicts.
+
+6. Dependencies
+Database: PostgreSQL + PostGIS for spatial data management.
+
+GIS Tools: LeafletJS, GeoServer, or equivalents for mapping.
+
+Analytics: Python libraries (Pandas, GeoPandas), R, or dashboard engine.
+
+Visualization: Plotly, D3.js, or PowerBI integration.
+
+Backend: FastAPI or Flask microservice for API orchestration.
+
+7. Risks & Mitigation
+Incomplete/Inconsistent data → Rigorous validation and low-confidence flagging.
+
+Performance degradation on large geospatial queries → Cloud scaling, caching mechanisms.
+
+User resistance → Intuitive UI/UX design, contextual guidance, and training programs.
+
+8. Future Enhancements
+AI-powered land allocation recommendations.
+
+Mobile-first DSS app for field use by officers.
+
+Scenario simulation for “what-if” land rights planning.
+
+Integration with national GIS portals and live satellite feeds.
