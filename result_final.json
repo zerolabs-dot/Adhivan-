@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "claim_data": {
+    "claim_id": "FRA/2023/MP/12345",
+    "claimant_name": "Ramesh Kumar Gond",
+    "tribe": "Gond",
+    "village": "Khairwani",
+    "district": "Mandla",
+    "state": "Madhya Pradesh",
+    "claim_type": "IFR",
+    "land_area": "2.5",
+    "application_date": "15-07-2023",
+    "supporting_documents": "",
+    "confidence_score": 0.95,
+    "raw_text": "Forest Rights Act Claim Application\n\nClaim ID: FRA/2023/MP/12345\nApplicant Name: Ramesh Kumar Gond\nTribe/Community: Gond\nVillage: Khairwani\nDistrict: Mandla\nState: Madhya Pradesh\n\nType of Claim: Individual Forest Rights (IFR)\nLand Area Claimed: 2.5 hectares\nApplication Date: 15-07-2023\n\nSupporting Documents:\n- Ration Card\n- Voter ID Card\n- Community Certificate\n- Land Survey Records\n\nAdditional Information:\nThe claimant has been residing in the forest area for over 75 years.\nTraditional occupation includes collection of minor forest produce.",
+    "processing_timestamp": "2025-09-29T17:07:40.723100"
+  },
+  "processing_time_seconds": 0.011993,
+  "needs_review": false
+}
